@@ -1,0 +1,14 @@
+# Ignore the virtual environment
+.venv/
+venv/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore scraped data (we don't want to upload old leads to GitHub)
+*.csv
+*.xlsx
+
+# Ignore OS junk files
+.DS_Store
