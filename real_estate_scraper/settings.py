@@ -72,7 +72,7 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "real_estate_scraper.pipelines.RealEstateScraperPipeline": 300,
-    "real_estate_scraper.pipelines.SaveItemPipeline":400
+    #"real_estate_scraper.pipelines.SaveItemPipeline":400
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
