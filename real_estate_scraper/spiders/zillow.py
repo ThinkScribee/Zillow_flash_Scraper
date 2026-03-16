@@ -15,7 +15,21 @@ class ZillowSpider(scrapy.Spider):
             "houston-tx",
             "dallas-tx",
             "austin-tx",
-            "san-antonio-tx"
+            "san-antonio-tx",
+            # Florida (High Volume)
+            "miami-fl",
+            "orlando-fl",
+            "tampa-fl",
+            "jacksonville-fl",
+
+            # Sunbelt & High Growth
+            "atlanta-ga",
+            "charlotte-nc",
+            "raleigh-nc",
+            "nashville-tn",
+            "phoenix-az",
+            "las-vegas-nv",
+            "denver-co"
         ]
         for city in cities:
             url = f"https://zillow.com/{city}"
