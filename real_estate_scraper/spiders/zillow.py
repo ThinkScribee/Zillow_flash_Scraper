@@ -2,7 +2,7 @@ from typing import Any
 
 import scrapy
 import json
-
+from urllib.parse import urlencode
 class ZillowSpider(scrapy.Spider):
     name = "zillow"
     allowed_domains = ["zillow.com"]
@@ -11,8 +11,13 @@ class ZillowSpider(scrapy.Spider):
 
     def start_requests(self):
         url = "https://zillow.com/houston-tx"
+        payload = {
+            "api_key": "2c4611ab-9b9e-4492-bbb0-0a72e5d92b14",
+            "uri":url
+        }
+        stealth_url = f"https://proxy.scrapeops.io/v1/? {urlencode(payload)}"
 
-        yield scrapy.Request(url=url, callback=self.parse, meta={"impersonate": "chrome124"
+        yield scrapy.Request(url=stealth_url, callback=self.parse, meta={"impersonate": "chrome124"
         })
 
     def parse(self, response):
