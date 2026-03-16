@@ -47,7 +47,9 @@ DOWNLOAD_HANDLERS = {
 
 # The library handles the user agent for us now
 USER_AGENT = None
+DOWNLOAD_TIMEOUT = 120
 
+RETRY_TIMES = 5
 # Ensure this is still in your settings (Required for impersonate)
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 # Enable or disable spider middlewares

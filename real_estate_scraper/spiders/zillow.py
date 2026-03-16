@@ -25,8 +25,7 @@ class ZillowSpider(scrapy.Spider):
             }
             stealth_url = f"https://proxy.scrapeops.io/v1/?{urlencode(payload)}"
 
-            yield scrapy.Request(url=stealth_url, callback=self.parse, meta={"impersonate": "chrome124"
-        })
+            yield scrapy.Request(url=stealth_url, callback=self.parse)
 
     def parse(self, response):
         script_text = response.css("script#__NEXT_DATA__::text").get()
