@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 class ZillowSpider(scrapy.Spider):
     name = "zillow"
     allowed_domains = ["zillow.com"]
-    start_urls = ["https://zillow.com"]
+    start_urls = ["https://zillow.com", "scrapeops.io"]
 
 
     def start_requests(self):
