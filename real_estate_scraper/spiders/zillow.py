@@ -13,9 +13,9 @@ class ZillowSpider(scrapy.Spider):
         url = "https://zillow.com/houston-tx"
         payload = {
             "api_key": "2c4611ab-9b9e-4492-bbb0-0a72e5d92b14",
-            "uri":url
+            "url":url
         }
-        stealth_url = f"https://proxy.scrapeops.io/v1/? {urlencode(payload)}"
+        stealth_url = f"https://proxy.scrapeops.io/v1/?{urlencode(payload)}"
 
         yield scrapy.Request(url=stealth_url, callback=self.parse, meta={"impersonate": "chrome124"
         })
