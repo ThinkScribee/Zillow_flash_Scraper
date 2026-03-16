@@ -1,87 +1,262 @@
+# 🏠 Real Estate Flash Leads Scraper
 
-```markdown
-# 🏠 Automated Real Estate ETL Pipeline
+> **Automated ETL Pipeline for Real-Time Property Intelligence**
 
-## 📌 Overview
-This project is a fully automated, serverless ETL (Extract, Transform, Load) pipeline designed to aggregate real-time real estate market data. It scrapes newly listed properties ("flash leads") across 15 major US housing markets and delivers a clean, formatted CSV report via email every morning.
+A serverless, cloud-native real estate data pipeline that monitors 15 major US housing markets for newly listed properties and delivers actionable insights via automated email reports.
 
-The system is built to autonomously bypass enterprise-grade anti-bot protections (PerimeterX) using residential proxy routing, and it runs on a strict CI/CD cron schedule requiring zero manual intervention.
+## 🎯 What It Does
 
-## ⚙️ Architecture & The ETL Process
+This system automatically identifies "flash leads" - properties that have been on the market for just minutes or hours - across major metropolitan areas. It bypasses anti-bot protections, processes raw JSON data, and delivers clean CSV reports to your inbox every morning at 9 AM UTC.
 
-* **Extract:** Utilizes **Scrapy** to intercept and parse hidden backend JSON payloads from Zillow, bypassing brittle HTML parsing. Traffic is routed through the **ScrapeOps Proxy API** to rotate IP addresses and avoid 403/401 datacenter blocks.
-* **Transform:** Python logic filters unstructured JSON data to isolate properties listed within the last few minutes or hours. It cleanses the data and maps specific key-value pairs (Price, Address, Zillow ID, URL).
-* **Load:** The clean data is loaded into a structured `.csv` format and automatically distributed to stakeholders using a custom **SMTP email script** directly from the cloud.
+## 🏗️ System Architecture
 
-## 🛠️ Tech Stack
-* **Language:** Python 3.11
-* **Framework:** Scrapy (Web Scraping / Data Extraction)
-* **Cloud Infrastructure:** GitHub Actions (Serverless CI/CD Automation)
-* **Network Routing:** ScrapeOps (Residential Proxy API)
-* **Delivery:** SMTP Protocol / Standard Python Email Library
+```mermaid
+graph TB
+    A[GitHub Actions Scheduler] -->|9:00 AM UTC Daily| B[Ubuntu Runner]
+    B --> C[Python Environment Setup]
+    C --> D[Install Dependencies]
+    D --> E[Scrapy Spider Launch]
+    
+    E --> F{Target Cities Loop}
+    F --> G[Houston, TX]
+    F --> H[Miami, FL]
+    F --> I[Atlanta, GA]
+    F --> J[... 12 More Cities]
+    
+    G --> K[ScrapeOps Proxy API]
+    H --> K
+    I --> K
+    J --> K
+    
+    K --> L[Zillow.com Request]
+    L --> M[Extract JSON from __NEXT_DATA__]
+    M --> N{Filter by Recency}
+    
+    N -->|Contains 'minute' or 'hour'| O[Extract Property Data]
+    N -->|Older listings| P[Skip Property]
+    
+    O --> Q[CSV Generation]
+    P --> Q
+    
+    Q --> R[Email Delivery via SMTP]
+    R --> S[Gmail Inbox]
+    
+    style A fill:#e1f5fe
+    style K fill:#fff3e0
+    style R fill:#e8f5e8
+```
 
-## 🚀 Cloud Automation (GitHub Actions)
-This engine is deployed to the cloud and runs automatically at 9:00 AM UTC every day. 
-The automation is handled by `.github/workflows/scraper.yml`.
+## 🔄 Data Flow Pipeline
 
-### Required GitHub Secrets
-To deploy this pipeline securely, the following credentials must be added to your repository's **Secrets and variables**:
-* `EMAIL_PASSWORD`: A 16-letter Google App Password used to securely authenticate the SMTP delivery script.
+```mermaid
+flowchart LR
+    subgraph "Extract Phase"
+        A[Zillow City Pages] --> B[Proxy Rotation]
+        B --> C[JSON Payload Extraction]
+    end
+    
+    subgraph "Transform Phase"
+        C --> D[Parse Property Objects]
+        D --> E{Time Filter}
+        E -->|Recent| F[Data Cleaning]
+        E -->|Old| G[Discard]
+        F --> H[Structure Mapping]
+    end
+    
+    subgraph "Load Phase"
+        H --> I[CSV Export]
+        I --> J[Email Attachment]
+        J --> K[SMTP Delivery]
+    end
+    
+    style A fill:#ffebee
+    style F fill:#fff8e1
+    style K fill:#e8f5e8
+```
 
-## 💻 How to Run Locally
+## 🛠️ Technology Stack
 
-If you wish to test the pipeline on your local machine:
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Web Scraping** | Scrapy 2.14+ | High-performance data extraction |
+| **Proxy Management** | ScrapeOps API | IP rotation & anti-bot bypass |
+| **Cloud Infrastructure** | GitHub Actions | Serverless automation |
+| **Data Processing** | Python 3.11 | ETL logic & transformations |
+| **Email Delivery** | SMTP (Gmail) | Automated report distribution |
+| **Data Format** | CSV | Structured output for analysis |
 
-**1. Clone the repository and install dependencies:**
+## 🎯 Target Markets
+
+The scraper monitors these high-volume real estate markets:
+
+**Texas Markets** (4 cities)
+- Houston, Dallas, Austin, San Antonio
+
+**Florida Markets** (4 cities)  
+- Miami, Orlando, Tampa, Jacksonville
+
+**Sunbelt & Growth Markets** (7 cities)
+- Atlanta, Charlotte, Raleigh, Nashville, Phoenix, Las Vegas, Denver
+
+## 📊 Data Schema
+
+Each property record contains:
+
+```json
+{
+  "id": "12345678",
+  "price": 450000,
+  "address": "123 Main St, Houston, TX 77001",
+  "time_on_market": "2 minutes ago",
+  "url": "https://zillow.com/homedetails/..."
+}
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.11+
+- ScrapeOps API key
+- Gmail account with App Password
+
+### Local Development
+
+1. **Clone & Setup**
 ```bash
-git clone [https://github.com/YOUR-USERNAME/real-estate-flash-scraper.git](https://github.com/YOUR-USERNAME/real-estate-flash-scraper.git)
-cd real-estate-flash-scraper
+git clone https://github.com/YOUR-USERNAME/real-estate-scraper.git
+cd real-estate-scraper
 python -m venv .venv
-source .venv/Scripts/activate  # (On Windows Git Bash)
+source .venv/Scripts/activate  # Windows
 pip install -r requirements.txt
-
 ```
 
-**2. Update API Keys:**
-
-* Open `real_estate_scraper/spiders/zillow.py`.
-* Insert your ScrapeOps API key into the `payload` dictionary.
-* Open `send_email.py` and update the sender and receiver email addresses.
-
-**3. Set your local environment variable for the email:**
-
-```bash
-export EMAIL_PASSWORD="your_16_letter_google_app_password"
-
+2. **Configure API Keys**
+```python
+# In real_estate_scraper/spiders/zillow.py
+payload = {
+    "api_key": "YOUR_SCRAPEOPS_API_KEY",
+    "url": url
+}
 ```
 
-**4. Run the Extractor & Trigger the Email:**
+3. **Set Email Credentials**
+```python
+# In send_email.py
+SENDER_EMAIL = "your-email@gmail.com"
+RECEIVER_EMAIL = "recipient@gmail.com"
+```
 
+4. **Run Pipeline**
 ```bash
-# Run the scraper and output the data to a CSV
+# Extract data
 scrapy crawl zillow -O todays_leads.csv
 
-# Run the delivery system
+# Send email report
+export EMAIL_PASSWORD="your_gmail_app_password"
 python send_email.py
-
 ```
 
-## ⚠️ Disclaimer
+## ☁️ Cloud Deployment
 
-This project was built strictly for educational and portfolio purposes to demonstrate ETL architecture, proxy network routing, and cloud automation. Please review and respect the Terms of Service of any website before scraping it at scale.
+### GitHub Actions Setup
 
+1. **Add Repository Secret**
+   - Go to Settings → Secrets and variables → Actions
+   - Add `EMAIL_PASSWORD` with your Gmail App Password
+
+2. **Automatic Execution**
+   - Runs daily at 9:00 AM UTC
+   - Manual trigger available via Actions tab
+
+### Workflow Process
+
+```mermaid
+sequenceDiagram
+    participant GH as GitHub Actions
+    participant VM as Ubuntu Runner
+    participant SP as ScrapeOps Proxy
+    participant ZL as Zillow
+    participant EM as Email Service
+    
+    GH->>VM: Trigger daily cron job
+    VM->>VM: Setup Python environment
+    VM->>VM: Install dependencies
+    VM->>SP: Route requests through proxy
+    SP->>ZL: Fetch city pages
+    ZL-->>SP: Return HTML + JSON
+    SP-->>VM: Proxy response
+    VM->>VM: Extract & filter data
+    VM->>VM: Generate CSV report
+    VM->>EM: Send email with attachment
+    EM-->>VM: Delivery confirmation
 ```
 
-***
+## 🔧 Configuration Options
 
-### How to add this to your project:
-1. Open your terminal and make sure you are in the root folder of your project.
-2. Type `touch README.md`.
-3. Open that file in PyCharm, paste the exact markdown above, and save it. (Make sure to change `YOUR-USERNAME` in the clone link to your actual GitHub username!).
-4. Run your standard Git commands: `git add README.md` -> `git commit -m "Added professional README"` -> `git push`.
-
-Once you push that, your GitHub repository will instantly transform from a basic code folder into a highly professional portfolio piece. 
-
-**You now have the code, the cloud architecture, the LinkedIn profile, and the GitHub documentation. Are you officially ready to start sending this out to recruiters?**
-
+### Spider Settings
+```python
+# real_estate_scraper/settings.py
+CONCURRENT_REQUESTS_PER_DOMAIN = 1  # Respectful crawling
+DOWNLOAD_DELAY = 1                  # Rate limiting
+RETRY_TIMES = 5                     # Error handling
+DOWNLOAD_TIMEOUT = 120              # Request timeout
 ```
+
+### Email Customization
+```python
+# send_email.py
+def send_leads():
+    # Customize subject line
+    msg['Subject'] = f"🚨 {lead_count} New Flash Leads"
+    
+    # Modify email body
+    msg.set_content(f"Found {lead_count} new properties...")
+```
+
+## 📈 Performance Metrics
+
+- **Coverage**: 15 major US markets
+- **Frequency**: Daily automated runs
+- **Speed**: ~2-3 minutes per city
+- **Accuracy**: JSON-based extraction (no HTML parsing)
+- **Reliability**: Proxy rotation prevents blocking
+
+## 🛡️ Anti-Bot Evasion
+
+The system employs several techniques to bypass detection:
+
+1. **Residential Proxy Rotation** via ScrapeOps
+2. **JSON Payload Extraction** (bypasses HTML parsing)
+3. **Respectful Rate Limiting** (1 req/sec per domain)
+4. **User-Agent Rotation** (handled by proxy service)
+
+## 📧 Email Report Format
+
+Daily reports include:
+- **Subject**: Lead count and urgency indicator
+- **Body**: Summary with key metrics
+- **Attachment**: Complete CSV with all properties
+- **Delivery**: Reliable SMTP via Gmail
+
+## ⚠️ Important Notes
+
+- **Educational Purpose**: Built for learning ETL architecture and cloud automation
+- **Rate Limiting**: Configured for respectful crawling
+- **Terms of Service**: Review target site policies before scaling
+- **Data Accuracy**: Flash leads are time-sensitive and may change rapidly
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test locally
+5. Submit a pull request
+
+## 📄 License
+
+This project is for educational and portfolio purposes. Please respect website terms of service and use responsibly.
+
+---
+
+**Ready to deploy?** Add your API keys, configure the email settings, and let the automation handle the rest. Your daily real estate intelligence reports will start flowing automatically.
