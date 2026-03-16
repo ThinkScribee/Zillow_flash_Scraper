@@ -40,10 +40,10 @@ DOWNLOAD_DELAY = 1
 #    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 #    "Accept-Language": "en",
 #}
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_impersonate.ImpersonateDownloadHandler",
-    "https": "scrapy_impersonate.ImpersonateDownloadHandler",
-}
+#DOWNLOAD_HANDLERS = {
+ #   "http": "scrapy_impersonate.ImpersonateDownloadHandler",
+  #  "https": "scrapy_impersonate.ImpersonateDownloadHandler",
+#}
 
 # The library handles the user agent for us now
 USER_AGENT = None
@@ -51,7 +51,7 @@ DOWNLOAD_TIMEOUT = 120
 
 RETRY_TIMES = 5
 # Ensure this is still in your settings (Required for impersonate)
-TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+#TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
