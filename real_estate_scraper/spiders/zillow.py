@@ -5,8 +5,8 @@ import json
 from urllib.parse import urlencode
 class ZillowSpider(scrapy.Spider):
     name = "zillow"
-    allowed_domains = ["zillow.com"]
-    start_urls = ["https://zillow.com", "scrapeops.io"]
+    allowed_domains = ["zillow.com", "scrapeops.io"]
+    start_urls = ["https://zillow.com"]
 
 
     def start_requests(self):
