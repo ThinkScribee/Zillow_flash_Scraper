@@ -10,14 +10,22 @@ class ZillowSpider(scrapy.Spider):
 
 
     def start_requests(self):
-        url = "https://zillow.com/houston-tx"
-        payload = {
-            "api_key": "2c4611ab-9b9e-4492-bbb0-0a72e5d92b14",
-            "url":url
-        }
-        stealth_url = f"https://proxy.scrapeops.io/v1/?{urlencode(payload)}"
 
-        yield scrapy.Request(url=stealth_url, callback=self.parse, meta={"impersonate": "chrome124"
+        cities = [
+            "houston-tx",
+            "dallas-tx",
+            "austin-tx",
+            "san-antonio-tx"
+        ]
+        for city in cities:
+            url = f"https://zillow.com/{city}"
+            payload = {
+                "api_key": "2c4611ab-9b9e-4492-bbb0-0a72e5d92b14",
+                "url":url
+            }
+            stealth_url = f"https://proxy.scrapeops.io/v1/?{urlencode(payload)}"
+
+            yield scrapy.Request(url=stealth_url, callback=self.parse, meta={"impersonate": "chrome124"
         })
 
     def parse(self, response):
